@@ -26,8 +26,8 @@ namespace Particulate.ParticleSystem.Renderers
         protected VBO indexVBO = new VBO("basicparticles_i", BufferTarget.ElementArrayBuffer);
         protected ShaderProgram program = new ShaderProgram("basicparticles_sp");
 
-        protected string VertexShaderName = "";
-        protected string FragmentShaderName = "";
+        protected string VertexShaderName = "particles.glsl|vert";
+        protected string FragmentShaderName = "particles.glsl|frag";
 
         protected int width;
         protected int height;
@@ -44,6 +44,7 @@ namespace Particulate.ParticleSystem.Renderers
         private void BasicParticleRenderer_Loading(object sender, EventArgs e)
         {
             InitVBOs();
+            Reload();
         }
 
         private void InitVBOs()
@@ -109,7 +110,20 @@ namespace Particulate.ParticleSystem.Renderers
 
         public void Render(IFrameRenderData frameData)
         {
-            
+            GL.Disable(EnableCap.DepthTest);
+            GL.Enable(EnableCap.ProgramPointSize);
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
+
+
+            program.UseProgram()
+                .SetUniform("projectionMatrix", ProjectionMatrix)
+                .SetUniform("modelMatrix", ModelMatrix)
+                .SetUniform("viewMatrix", ViewMatrix);
+            vertexVBO.Bind(this.program.VariableLocation("vertex"));
+            indexVBO.Bind();
+            GL.DrawElements(BeginMode.Points, indexVBO.Length, DrawElementsType.UnsignedInt, 0);
+
         }
     }
 }

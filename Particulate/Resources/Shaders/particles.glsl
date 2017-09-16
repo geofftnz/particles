@@ -14,7 +14,7 @@ void main()
 	pos = gl_Position.xyz;
 	//texcoord = vertex.xy;
 
-	gl_PointSize = 8.0;
+	gl_PointSize = 1.0;
 }
 
 //|frag
@@ -27,5 +27,5 @@ layout (location = 0) out vec4 out_Colour;
 void main(void)
 {
 
-	out_Colour = pos * 0.5 + 0.5;
+	out_Colour = vec4(pos * 0.5 + 0.5,1.0);
 }
