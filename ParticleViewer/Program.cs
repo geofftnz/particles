@@ -26,17 +26,14 @@ namespace ParticleViewer
 
             try
             {
-                using (var v = new Snowscape.TerrainGenerationViewer.TerrainGenerationViewer())
+                using (var v = new ParticleTestBench())
                 {
                     v.Run(60);
                 }
             }
             catch (Exception ex)
             {
-                //MessageBox.Show(ex.Message, ex.GetType().Name);
-
                 log.Error(ex, "uncaught exception");
-
                 throw;
             }
 
