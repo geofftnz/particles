@@ -112,6 +112,9 @@ namespace Particulate.ParticleSystem.Renderers
         {
             GL.Disable(EnableCap.DepthTest);
             GL.Enable(EnableCap.ProgramPointSize);
+            GL.PointParameter(PointParameterName.PointSpriteCoordOrigin, (int)PointSpriteCoordOriginParameter.UpperLeft);
+            //GL.Enable(EnableCap.VertexProgramPointSize);
+            GL.Enable(EnableCap.PointSprite);
             GL.Enable(EnableCap.Blend);
             GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
 

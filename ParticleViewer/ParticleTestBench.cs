@@ -12,6 +12,8 @@ using System.Threading;
 using OpenTKExtensions;
 using OpenTKExtensions.Filesystem;
 using System.Diagnostics;
+using ParticleViewer.Common;
+using OpenTKExtensions.Camera;
 
 namespace ParticleViewer
 {
@@ -19,10 +21,11 @@ namespace ParticleViewer
     {
         private const string SHADERPATH = @"../../Resources/Shaders;../../../Particulate/Resources/Shaders;Resources/Shaders";
         private GameComponentCollection components = new GameComponentCollection();
-        //private FileSystemPoller shaderUpdatePoller = new FileSystemPoller(SHADERPATH.Split(';')[0]);
         private MultiPathFileSystemPoller shaderUpdatePoller = new MultiPathFileSystemPoller(SHADERPATH.Split(';'));
         private double lastShaderPollTime = 0.0;
         private Stopwatch timer = new Stopwatch();
+        private Resources resources;
+        private ICamera camera;
 
         public class RenderData : IFrameRenderData, IFrameUpdateData
         {
@@ -41,7 +44,16 @@ namespace ParticleViewer
             this.RenderFrame += ParticleTestBench_RenderFrame;
             this.Resize += ParticleTestBench_Resize;
 
-            components.Add(new BasicParticleRenderer());
+            components.Add(camera = new WalkCamera(this.Keyboard, this.Mouse)
+            {
+                FOV = 75.0f,
+                ZFar = 10.0f,
+                ZNear = 0.001f,
+                MovementSpeed = 0.0001f,
+                LookMode = WalkCamera.LookModeEnum.Mouse1                
+            }, 1);
+            components.Add(resources = new Resources());
+            components.Add(new BasicParticleRenderer(1024, 1024));
 
             // set default shader loader
             ShaderProgram.DefaultLoader = new OpenTKExtensions.Loaders.MultiPathFileSystemLoader(SHADERPATH);
@@ -50,6 +62,7 @@ namespace ParticleViewer
 
         private void ParticleTestBench_Resize(object sender, EventArgs e)
         {
+            GL.Viewport(this.ClientRectangle);
             components.Resize(ClientRectangle.Width, ClientRectangle.Height);
         }
 
@@ -71,6 +84,9 @@ namespace ParticleViewer
                 components.Reload();
                 shaderUpdatePoller.Reset();
             }
+
+            components.ProjectionMatrix = camera.Projection;
+            components.ViewMatrix = camera.View;
 
 
             GL.ClearColor(0.0f, 0.1f, 0.2f, 1.0f);
