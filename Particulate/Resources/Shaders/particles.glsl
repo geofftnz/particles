@@ -5,6 +5,7 @@ layout (location = 0) in vec2 vertex;
 layout (location = 0) out vec3 pos;
 layout (location = 1) out float size;
 //layout (location = 1) out vec2 pos;
+uniform float screenFactor;
 uniform mat4 projectionMatrix;
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
@@ -16,7 +17,8 @@ void main()
 	//texcoord = vertex.xy;
 
 	// https://stackoverflow.com/questions/8608844/resizing-point-sprites-based-on-distance-from-the-camera
-	float s = 2.0;
+	//float s = 2.0 * (sqrt(screenWidth) / 28.0);
+	float s = 2.0 * screenFactor;
 
 	vec4 p = vec4(vertex.x,vertex.y,mod(vertex.x*vertex.y*50.0,1.0),1.0);  //TODO read from texture.
 

@@ -13,14 +13,13 @@ namespace Particulate.ParticleSystem.Renderers
     /// <summary>
     /// A basic renderer for particles
     /// </summary>
-    public class BasicParticleRenderer : GameComponentBase, IRenderable, IUpdateable, IReloadable, ITransformable
+    public class BasicParticleRenderer : GameComponentBase, IRenderable, IUpdateable, IReloadable, ITransformable, IResizeable
     {
         public int DrawOrder { get; set; } = 0;
         public bool Visible { get; set; } = true;
         public Matrix4 ViewMatrix { get; set; } = Matrix4.Identity;
         public Matrix4 ModelMatrix { get; set; } = Matrix4.Identity;
         public Matrix4 ProjectionMatrix { get; set; } = Matrix4.Identity;
-
 
         protected VBO vertexVBO = new VBO("basicparticles_v");
         protected VBO indexVBO = new VBO("basicparticles_i", BufferTarget.ElementArrayBuffer);
@@ -31,6 +30,8 @@ namespace Particulate.ParticleSystem.Renderers
 
         protected int width;
         protected int height;
+
+        protected float screenWidth = 800.0f;
 
         public BasicParticleRenderer(int width = 256, int height = 256)
         {
@@ -120,6 +121,7 @@ namespace Particulate.ParticleSystem.Renderers
 
 
             program.UseProgram()
+                .SetUniform("screenFactor", (float)Math.Sqrt(screenWidth / 1280.0))
                 .SetUniform("projectionMatrix", ProjectionMatrix)
                 .SetUniform("modelMatrix", ModelMatrix)
                 .SetUniform("viewMatrix", ViewMatrix);
@@ -127,6 +129,11 @@ namespace Particulate.ParticleSystem.Renderers
             indexVBO.Bind();
             GL.DrawElements(BeginMode.Points, indexVBO.Length, DrawElementsType.UnsignedInt, 0);
 
+        }
+
+        public void Resize(int width, int height)
+        {
+            this.screenWidth = width;
         }
     }
 }
