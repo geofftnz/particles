@@ -19,13 +19,13 @@ void main()
 
 	// https://stackoverflow.com/questions/8608844/resizing-point-sprites-based-on-distance-from-the-camera
 	//float s = 2.0 * (sqrt(screenWidth) / 28.0);
-	float s = 2.0 * screenFactor;
 
 	//vec4 p = vec4(vertex.x,vertex.y,mod(vertex.x*vertex.y*50.0,1.0),1.0);  //TODO read from texture.
 
 	vec4 ptex = texture2D(particlePositionTexture,vertex.xy);
 
 	vec4 p = vec4(ptex.xyz,1.0);
+	float s = ptex.a * screenFactor;
 
 	vec4 eyePos = viewMatrix * modelMatrix * p;
 	vec4 corner = projectionMatrix * vec4(s,s,eyePos.z,eyePos.w);
@@ -50,11 +50,13 @@ void main(void)
 	vec2 pc = (gl_PointCoord.st - vec2(0.5)) * 2.0;
 	float rsq = dot(pc,pc);
 
-	float a = (1.0 - smoothstep(0.5,1.0,rsq));
-	a *= (1.0 / (1.0 + rsq * 50.0));
+	// smooth dots with falloff
+	//float a = (1.0 - smoothstep(0.5,1.0,rsq)) * (1.0 / (1.0 + rsq * 10.0));
+	
+	// 
+	float a = (1.0 - smoothstep(0.1,1.0,rsq));
+
 
 	a *= min(1.0,size*0.1);
-	
-
 	out_Colour = vec4(col,a);
 }

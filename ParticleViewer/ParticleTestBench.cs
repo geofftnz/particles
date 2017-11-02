@@ -69,7 +69,13 @@ namespace ParticleViewer
             components.Add(particleRenderer = new BasicParticleRenderer(particleArrayWidth, particleArrayHeight) { DrawOrder = 2 });
             components.Add(particleRenderTarget = new BasicParticleRenderTarget(particleArrayWidth, particleArrayHeight) { DrawOrder = 1 });
 
-            particleOperator = new OperatorTest();
+            particleOperator = new OperatorTest()
+            {
+                SetShaderUniforms = (sp) =>
+                {
+                    sp.SetUniform("time", (float)timer.Elapsed.TotalSeconds);
+                }
+            };
             particleRenderTarget.Add(particleOperator);
 
             particleRenderer.PreRender += (s, e) => { particleRenderer.ParticlePositionTexture = particleRenderTarget.GetTexture(0); };
