@@ -5,8 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenTKExtensions;
 using OpenTKExtensions.Framework;
+using OpenTKExtensions.Resources;
 using OpenTK;
-using OpenTK.Graphics.OpenGL;
+using OpenTK.Graphics.OpenGL4;
 
 namespace Particulate.ParticleSystem.Renderers
 {
@@ -21,9 +22,9 @@ namespace Particulate.ParticleSystem.Renderers
         public Matrix4 ModelMatrix { get; set; } = Matrix4.Identity;
         public Matrix4 ProjectionMatrix { get; set; } = Matrix4.Identity;
 
-        protected VBO vertexVBO = new VBO("basicparticles_v");
-        protected VBO indexVBO = new VBO("basicparticles_i", BufferTarget.ElementArrayBuffer);
-        protected ShaderProgram program = new ShaderProgram("basicparticles_sp");
+        protected BufferObject<Vector2> vertexVBO;
+        protected BufferObject<uint> indexVBO;
+        protected ReloadableResource<ShaderProgram> program;
 
         protected string VertexShaderName = "particles.glsl|vert";
         protected string FragmentShaderName = "particles.glsl|frag";
@@ -45,7 +46,9 @@ namespace Particulate.ParticleSystem.Renderers
         private void BasicParticleRenderer_Loading(object sender, EventArgs e)
         {
             InitVBOs();
-            Reload();
+            program = new ReloadableResource<ShaderProgram>("proghost", () => { return new ShaderProgram("prog", "vertex", "", true, VertexShaderName, FragmentShaderName); }, (sp) => new ShaderProgram(sp));
+            Resources.Add(program);
+
         }
 
         private void InitVBOs()
@@ -67,8 +70,11 @@ namespace Particulate.ParticleSystem.Renderers
                 }
             }
 
-            vertexVBO.SetData(vertex);
-            indexVBO.SetData(index);
+            vertexVBO = new BufferObject<Vector2>("vbuf", BufferTarget.ArrayBuffer, BufferUsageHint.StaticDraw, vertex);
+            Resources.Add(vertexVBO);
+
+            indexVBO = new BufferObject<uint>("ibuf", BufferTarget.ElementArrayBuffer, BufferUsageHint.StaticDraw, index);
+            Resources.Add(indexVBO);
         }
 
         private void BasicParticleRenderer_Unloading(object sender, EventArgs e)
@@ -76,37 +82,9 @@ namespace Particulate.ParticleSystem.Renderers
             program?.Unload();
         }
 
-
-        public void Reload()
-        {
-            this.ReloadShader(this.LoadShader, this.SetShader, log);
-        }
-
-        private ShaderProgram LoadShader()
-        {
-            var program = new ShaderProgram(this.GetType().Name);
-            program.Init(
-                VertexShaderName,
-                FragmentShaderName,
-                new List<Variable>
-                {
-                    new Variable(0, "vertex")
-                });
-            return program;
-        }
-
-        private void SetShader(ShaderProgram newprogram)
-        {
-            if (this.program != null)
-            {
-                this.program.Unload();
-            }
-            this.program = newprogram;
-        }
-
         public void Update(IFrameUpdateData frameData)
         {
-            
+
         }
 
         public void Render(IFrameRenderData frameData)
@@ -120,12 +98,12 @@ namespace Particulate.ParticleSystem.Renderers
             GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
 
 
-            program.UseProgram()
+            program.Resource.Use()
                 .SetUniform("screenFactor", (float)Math.Sqrt(screenWidth / 1280.0))
                 .SetUniform("projectionMatrix", ProjectionMatrix)
                 .SetUniform("modelMatrix", ModelMatrix)
                 .SetUniform("viewMatrix", ViewMatrix);
-            vertexVBO.Bind(this.program.VariableLocation("vertex"));
+            vertexVBO.Bind(program.Resource.VariableLocations["vertex"]);
             indexVBO.Bind();
             GL.DrawElements(BeginMode.Points, indexVBO.Length, DrawElementsType.UnsignedInt, 0);
 
@@ -134,6 +112,11 @@ namespace Particulate.ParticleSystem.Renderers
         public void Resize(int width, int height)
         {
             this.screenWidth = width;
+        }
+
+        public void Reload()
+        {
+            Resources.Reload();
         }
     }
 }

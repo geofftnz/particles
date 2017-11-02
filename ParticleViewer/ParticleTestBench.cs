@@ -14,6 +14,7 @@ using OpenTKExtensions.Filesystem;
 using System.Diagnostics;
 using ParticleViewer.Common;
 using OpenTKExtensions.Camera;
+using OpenTKExtensions.Resources;
 
 namespace ParticleViewer
 {
