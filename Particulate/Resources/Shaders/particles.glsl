@@ -9,6 +9,7 @@ uniform float screenFactor;
 uniform mat4 projectionMatrix;
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
+uniform sampler2D particlePositionTexture;
 
 void main() 
 {
@@ -20,7 +21,11 @@ void main()
 	//float s = 2.0 * (sqrt(screenWidth) / 28.0);
 	float s = 2.0 * screenFactor;
 
-	vec4 p = vec4(vertex.x,vertex.y,mod(vertex.x*vertex.y*50.0,1.0),1.0);  //TODO read from texture.
+	//vec4 p = vec4(vertex.x,vertex.y,mod(vertex.x*vertex.y*50.0,1.0),1.0);  //TODO read from texture.
+
+	vec4 ptex = texture2D(particlePositionTexture,vertex.xy);
+
+	vec4 p = vec4(ptex.xyz,1.0);
 
 	vec4 eyePos = viewMatrix * modelMatrix * p;
 	vec4 corner = projectionMatrix * vec4(s,s,eyePos.z,eyePos.w);

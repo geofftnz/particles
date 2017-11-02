@@ -22,6 +22,8 @@ namespace Particulate.ParticleSystem.Renderers
         public Matrix4 ModelMatrix { get; set; } = Matrix4.Identity;
         public Matrix4 ProjectionMatrix { get; set; } = Matrix4.Identity;
 
+        public Texture ParticlePositionTexture { get; set; } = null;
+
         protected BufferObject<Vector2> vertexVBO;
         protected BufferObject<uint> indexVBO;
         protected ReloadableResource<ShaderProgram> program;
@@ -97,12 +99,14 @@ namespace Particulate.ParticleSystem.Renderers
             GL.Enable(EnableCap.Blend);
             GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
 
+            ParticlePositionTexture?.Bind(TextureUnit.Texture0);
 
             program.Resource.Use()
                 .SetUniform("screenFactor", (float)Math.Sqrt(screenWidth / 1280.0))
                 .SetUniform("projectionMatrix", ProjectionMatrix)
                 .SetUniform("modelMatrix", ModelMatrix)
-                .SetUniform("viewMatrix", ViewMatrix);
+                .SetUniform("viewMatrix", ViewMatrix)
+                .SetUniform("particlePositionTexture", 0);
             vertexVBO.Bind(program.Resource.VariableLocations["vertex"]);
             indexVBO.Bind();
             GL.DrawElements(BeginMode.Points, indexVBO.Length, DrawElementsType.UnsignedInt, 0);

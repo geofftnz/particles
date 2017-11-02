@@ -13,7 +13,7 @@ namespace ParticleViewer.Common
     /// <summary>
     /// Wrapper for common resources, such as fonts
     /// </summary>
-    public class Resources : CompositeGameComponent
+    public class CommonResources : CompositeGameComponent
     {
         public Font fontLucidaConsole { get; private set; }
         public FrameCounter frameCounter { get; private set; }
@@ -21,7 +21,7 @@ namespace ParticleViewer.Common
         //public ICamera camera { get; private set; }
 
 
-        public Resources()
+        public CommonResources()
         {
             Components.Add(fontLucidaConsole = new Font(@"Resources\Font\lucon.ttf_sdf.1024.png", @"Resources\Font\lucon.ttf_sdf.1024.txt"), 1);
             Components.Add(frameCounter = new FrameCounter(fontLucidaConsole) { TextSize = 0.0006f}, 2);

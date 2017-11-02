@@ -15,6 +15,8 @@ using System.Diagnostics;
 using ParticleViewer.Common;
 using OpenTKExtensions.Camera;
 using OpenTKExtensions.Resources;
+using Particulate.ParticleSystem.Targets;
+using Particulate.ParticleSystem.Operators;
 
 namespace ParticleViewer
 {
@@ -25,8 +27,15 @@ namespace ParticleViewer
         private MultiPathFileSystemPoller shaderUpdatePoller = new MultiPathFileSystemPoller(SHADERPATH.Split(';'));
         private double lastShaderPollTime = 0.0;
         private Stopwatch timer = new Stopwatch();
-        private Resources resources;
+        private CommonResources resources;
         private ICamera camera;
+
+        private int particleArrayWidth = 1024;
+        private int particleArrayHeight = 1024;
+
+        BasicParticleRenderer particleRenderer;
+        BasicParticleRenderTarget particleRenderTarget;
+        OperatorTest particleOperator;
 
         public class RenderData : IFrameRenderData, IFrameUpdateData
         {
@@ -37,33 +46,40 @@ namespace ParticleViewer
 
         public ParticleTestBench() : base(800, 600, GraphicsMode.Default, "Particles or summin or nuttin", GameWindowFlags.Default, DisplayDevice.Default, 4, 3, GraphicsContextFlags.ForwardCompatible)
         {
-            this.VSync = VSyncMode.Off;
+            VSync = VSyncMode.Off;
 
-            this.Load += ParticleTestBench_Load;
-            this.Unload += ParticleTestBench_Unload;
-            this.UpdateFrame += ParticleTestBench_UpdateFrame;
-            this.RenderFrame += ParticleTestBench_RenderFrame;
-            this.Resize += ParticleTestBench_Resize;
+            Load += ParticleTestBench_Load;
+            Unload += ParticleTestBench_Unload;
+            UpdateFrame += ParticleTestBench_UpdateFrame;
+            RenderFrame += ParticleTestBench_RenderFrame;
+            Resize += ParticleTestBench_Resize;
 
-            components.Add(camera = new WalkCamera(this.Keyboard, this.Mouse)
+            // set default shader loader
+            ShaderProgram.DefaultLoader = new OpenTKExtensions.Loaders.MultiPathFileSystemLoader(SHADERPATH);
+
+            components.Add(camera = new WalkCamera(Keyboard, Mouse)
             {
                 FOV = 75.0f,
                 ZFar = 10.0f,
                 ZNear = 0.001f,
                 MovementSpeed = 0.0001f,
-                LookMode = WalkCamera.LookModeEnum.Mouse1                
+                LookMode = WalkCamera.LookModeEnum.Mouse1
             }, 1);
-            components.Add(resources = new Resources());
-            components.Add(new BasicParticleRenderer(1024, 1024));
+            components.Add(resources = new CommonResources());
+            components.Add(particleRenderer = new BasicParticleRenderer(particleArrayWidth, particleArrayHeight) { DrawOrder = 2 });
+            components.Add(particleRenderTarget = new BasicParticleRenderTarget(particleArrayWidth, particleArrayHeight) { DrawOrder = 1 });
 
-            // set default shader loader
-            ShaderProgram.DefaultLoader = new OpenTKExtensions.Loaders.MultiPathFileSystemLoader(SHADERPATH);
+            particleOperator = new OperatorTest();
+            particleRenderTarget.Add(particleOperator);
+
+            particleRenderer.PreRender += (s, e) => { particleRenderer.ParticlePositionTexture = particleRenderTarget.GetTexture(0); };
+
 
         }
 
         private void ParticleTestBench_Resize(object sender, EventArgs e)
         {
-            GL.Viewport(this.ClientRectangle);
+            GL.Viewport(ClientRectangle);
             components.Resize(ClientRectangle.Width, ClientRectangle.Height);
         }
 
