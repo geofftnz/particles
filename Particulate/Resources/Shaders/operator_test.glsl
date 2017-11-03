@@ -111,7 +111,7 @@ vec4 strings1(vec2 coord)
 	return vec4(p,1.5);
 }
 
-#define N 4.0
+//#define N 5000.0
 
 vec3 getRandomPos(float x)
 {
@@ -126,6 +126,8 @@ vec4 strings2(vec2 coord)
 {
 	vec3 p = vec3(0.0);
 	float index = coord.x / 1024.0 + coord.y;
+
+	float N = (sin(time*0.1)*0.5+0.5) * 1000.0;
 
 	vec2 qc = floor(coord*N);
 
@@ -142,8 +144,8 @@ vec4 strings2(vec2 coord)
 	vec3 p0 = getRandomPos(grp);
 	vec3 p1 = getRandomPos(grp+1.0);
 	//vec3 p3 = getRandomPos(grp+2);
-	vec3 m0 = (p0 - getRandomPos(grp-1.0))*tangent;
-	vec3 m1 = -(p1 - getRandomPos(grp+2.0))*tangent;
+	vec3 m0 = (p1 - getRandomPos(grp-1.0))*tangent;
+	vec3 m1 = -(p0 - getRandomPos(grp+2.0))*tangent;
 
 	p = p0 * (2.0*t3-3.0*t2+1.0) + m0 * (t3-2.0*t2+t) + p1*(-2.0*t3+3.0*t2) + m1*(t3-t2);
 
