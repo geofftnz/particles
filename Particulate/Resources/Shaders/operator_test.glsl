@@ -164,5 +164,5 @@ vec4 strings2(vec2 coord)
 void main(void)
 {
 	
-	out_Pos = strings2(texcoord);
+	out_Pos = blob1(texcoord);
 }
