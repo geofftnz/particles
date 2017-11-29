@@ -51,8 +51,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ParticleSystem\Models\MotionParticleModel.cs" />
     <Compile Include="ParticleSystem\Operators\OperatorTest.cs" />
     <Compile Include="ParticleSystem\Renderers\BasicParticleRenderer.cs" />
+    <Compile Include="ParticleSystem\Targets\PosVelColRenderTarget.cs" />
     <Compile Include="ParticleSystem\Targets\BasicParticleRenderTarget.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
