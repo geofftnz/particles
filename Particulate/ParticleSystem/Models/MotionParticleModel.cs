@@ -12,12 +12,12 @@ namespace Particulate.ParticleSystem.Models
     /// <summary>
     /// Exists to hold the double-buffered textures for a particle system
     /// </summary>
-    public class MotionParticleModel : GameComponentBase, IRenderable
+    public class MotionParticleModel : GameComponentBase, IListTextures
     {
         public int Width { get; protected set; }
         public int Height { get; protected set; }
 
-        public bool Visible { get; set; } = true;
+        public bool Visible { get; set; } = false;
         public int DrawOrder { get; set; } = int.MaxValue;
 
         public Texture ParticlePositionRead { get { return particlePosition.ReadTexture; } }
@@ -45,12 +45,18 @@ namespace Particulate.ParticleSystem.Models
             Resources.Add(particleColour = new DoubleBufferedTexture("particlecol", Width, Height, TextureTarget.Texture2D, PixelInternalFormat.Rgba32f, PixelFormat.Rgba, PixelType.Float, Texture.Params().FilterNearest().ClampToEdge().ToArray()));
         }
 
-        public void Render(IFrameRenderData frameData)
+        public void SwapBuffers()
         {
-            // we're not actually drawing anything, but we'll swap the double-buffered textures
             particlePosition.Swap();
             particleVelocity.Swap();
             particleColour.Swap();
+        }
+
+        public IEnumerable<Texture> Textures()
+        {
+            yield return particlePosition.ReadTexture;
+            yield return particleVelocity.ReadTexture;
+            yield return particleColour.ReadTexture;
         }
     }
 }
