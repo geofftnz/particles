@@ -63,11 +63,13 @@ namespace ParticleViewer
                 ZFar = 10.0f,
                 ZNear = 0.001f,
                 MovementSpeed = 0.0001f,
-                LookMode = WalkCamera.LookModeEnum.Mouse1
+                LookMode = WalkCamera.LookModeEnum.Mouse1,
+                Position = new Vector3(0f, 0f, 0f),
+                EyeHeight = 0f
             }, 1);
             components.Add(resources = new CommonResources());
-            components.Add(particleRenderer = new BasicParticleRenderer(particleArrayWidth, particleArrayHeight) { DrawOrder = 2 });
             components.Add(particleRenderTarget = new BasicParticleRenderTarget(particleArrayWidth, particleArrayHeight) { DrawOrder = 1 });
+            components.Add(particleRenderer = new BasicParticleRenderer(particleArrayWidth, particleArrayHeight) { DrawOrder = 2 });
 
             particleOperator = new OperatorTest()
             {
