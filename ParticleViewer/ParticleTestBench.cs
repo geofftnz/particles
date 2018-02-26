@@ -17,6 +17,7 @@ using OpenTKExtensions.Camera;
 using OpenTKExtensions.Resources;
 using Particulate.ParticleSystem.Targets;
 using Particulate.ParticleSystem.Operators;
+using Particulate.ParticleSystem.Models;
 
 namespace ParticleViewer
 {
@@ -33,9 +34,10 @@ namespace ParticleViewer
         private int particleArrayWidth = 1024;
         private int particleArrayHeight = 1024;
 
-        BasicParticleRenderer particleRenderer;
-        BasicParticleRenderTarget particleRenderTarget;
-        OperatorTest particleOperator;
+        ColourParticleRenderer particleRenderer;
+        IParticleRenderTarget particleRenderTarget;
+        PosVelColOperator particleOperator;
+        MotionParticleModel model;
 
         public class RenderData : IFrameRenderData, IFrameUpdateData
         {
@@ -68,19 +70,49 @@ namespace ParticleViewer
                 EyeHeight = 0f
             }, 1);
             components.Add(resources = new CommonResources());
-            components.Add(particleRenderTarget = new BasicParticleRenderTarget(particleArrayWidth, particleArrayHeight) { DrawOrder = 1 });
-            components.Add(particleRenderer = new BasicParticleRenderer(particleArrayWidth, particleArrayHeight) { DrawOrder = 2 });
 
-            particleOperator = new OperatorTest()
+            // Particle model
+            components.Add(model = new MotionParticleModel(particleArrayWidth, particleArrayHeight));
+
+            // Particle render target
+            components.Add(particleRenderTarget = new PosVelColRenderTarget(particleArrayWidth, particleArrayHeight)
             {
+                DrawOrder = 1,
+                SetBuffers = (rt) =>
+                {
+                    rt.SetOutput(0, model.ParticlePositionWrite);
+                    rt.SetOutput(1, model.ParticleVelocityWrite);
+                    rt.SetOutput(2, model.ParticleColourWrite);
+                }
+            });
+
+            // particle operator
+            particleRenderTarget.Add(particleOperator = new PosVelColOperator()
+            {
+                TextureBinds = () =>
+                {
+                    var m = model;
+                    m.ParticlePositionRead.Bind(TextureUnit.Texture0);
+                    m.ParticleVelocityRead.Bind(TextureUnit.Texture1);
+                    m.ParticleColourRead.Bind(TextureUnit.Texture2);
+                },
                 SetShaderUniforms = (sp) =>
                 {
                     sp.SetUniform("time", (float)timer.Elapsed.TotalSeconds);
+                    sp.SetUniform("particlePositionTexture", 0);
+                    sp.SetUniform("particleVelocityTexture", 1);
+                    sp.SetUniform("particleColourTexture", 2);
                 }
-            };
-            particleRenderTarget.Add(particleOperator);
+            });
 
-            particleRenderer.PreRender += (s, e) => { particleRenderer.ParticlePositionTexture = particleRenderTarget.GetTexture(0); };
+            // Render particles
+            components.Add(particleRenderer = new ColourParticleRenderer(particleArrayWidth, particleArrayHeight)
+            {
+                DrawOrder = 2,
+                ParticlePositionTextureFunc = () => model.ParticlePositionWrite,
+                ParticleColourTextureFunc = () => model.ParticleColourWrite
+            });
+
 
 
         }
@@ -129,8 +161,8 @@ namespace ParticleViewer
             //text.Render();
 
             SwapBuffers();
+            model.SwapBuffers();
             Thread.Sleep(0);
-
 
 
 

@@ -9,11 +9,12 @@ using System.Threading.Tasks;
 
 namespace Particulate.ParticleSystem.Targets
 {
-    public class PosVelColRenderTarget : RenderTargetBase
+    public class PosVelColRenderTarget : RenderTargetBase, IParticleRenderTarget
     {
 
         public PosVelColRenderTarget(int width, int height) : base(false, false, width, height)
         {
+            
             SetOutput(0,
                 new TextureSlotParam(TextureTarget.Texture2D, PixelInternalFormat.Rgba32f, PixelFormat.Rgba, PixelType.Float, false,
                     TextureParameter.Create(TextureParameterName.TextureMagFilter, TextureMagFilter.Nearest),

@@ -52,8 +52,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ParticleSystem\Models\MotionParticleModel.cs" />
+    <Compile Include="ParticleSystem\Operators\PosVelColOperator.cs" />
     <Compile Include="ParticleSystem\Operators\OperatorTest.cs" />
+    <Compile Include="ParticleSystem\Renderers\ColourParticleRenderer.cs" />
     <Compile Include="ParticleSystem\Renderers\BasicParticleRenderer.cs" />
+    <Compile Include="ParticleSystem\Targets\IParticleRenderTarget.cs" />
     <Compile Include="ParticleSystem\Targets\PosVelColRenderTarget.cs" />
     <Compile Include="ParticleSystem\Targets\BasicParticleRenderTarget.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -61,7 +64,13 @@
   <ItemGroup>
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
+    <None Include="Resources\Shaders\posvelcol_operator.glsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Resources\Shaders\operator_test.glsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\Shaders\particles_col.glsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Resources\Shaders\particles.glsl">

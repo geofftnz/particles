@@ -14,7 +14,7 @@ namespace Particulate.ParticleSystem.Renderers
     /// <summary>
     /// A basic renderer for particles
     /// </summary>
-    public class BasicParticleRenderer : GameComponentBase, IRenderable, IUpdateable, IReloadable, ITransformable, IResizeable
+    public class ColourParticleRenderer : GameComponentBase, IRenderable, IUpdateable, IReloadable, ITransformable, IResizeable
     {
         public int DrawOrder { get; set; } = 0;
         public bool Visible { get; set; } = true;
@@ -23,29 +23,30 @@ namespace Particulate.ParticleSystem.Renderers
         public Matrix4 ProjectionMatrix { get; set; } = Matrix4.Identity;
 
         public Func<Texture> ParticlePositionTextureFunc { get; set; } = null;
+        public Func<Texture> ParticleColourTextureFunc { get; set; } = null;
 
         protected BufferObject<Vector2> vertexVBO;
         protected BufferObject<uint> indexVBO;
         protected ReloadableResource<ShaderProgram> program;
 
-        protected string VertexShaderName = "particles.glsl|vert";
-        protected string FragmentShaderName = "particles.glsl|frag";
+        protected string VertexShaderName = "particles_col.glsl|vert";
+        protected string FragmentShaderName = "particles_col.glsl|frag";
 
         protected int width;
         protected int height;
 
         protected float screenWidth = 800.0f;
 
-        public BasicParticleRenderer(int width = 256, int height = 256)
+        public ColourParticleRenderer(int width = 256, int height = 256)
         {
             this.width = width;
             this.height = height;
 
-            Loading += BasicParticleRenderer_Loading;
-            Unloading += BasicParticleRenderer_Unloading;
+            Loading += ColourParticleRenderer_Loading;
+            Unloading += ColourParticleRenderer_Unloading;
         }
 
-        private void BasicParticleRenderer_Loading(object sender, EventArgs e)
+        private void ColourParticleRenderer_Loading(object sender, EventArgs e)
         {
             InitVBOs();
             program = new ReloadableResource<ShaderProgram>("proghost", () => { return new ShaderProgram("prog", "vertex", "", true, VertexShaderName, FragmentShaderName); }, (sp) => new ShaderProgram(sp));
@@ -79,7 +80,7 @@ namespace Particulate.ParticleSystem.Renderers
             Resources.Add(indexVBO);
         }
 
-        private void BasicParticleRenderer_Unloading(object sender, EventArgs e)
+        private void ColourParticleRenderer_Unloading(object sender, EventArgs e)
         {
             program?.Unload();
         }
@@ -100,13 +101,15 @@ namespace Particulate.ParticleSystem.Renderers
             GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
 
             ParticlePositionTextureFunc?.Invoke()?.Bind(TextureUnit.Texture0);
+            ParticleColourTextureFunc?.Invoke()?.Bind(TextureUnit.Texture1);
 
             program.Resource.Use()
                 .SetUniform("screenFactor", (float)Math.Sqrt(screenWidth / 1280.0))
                 .SetUniform("projectionMatrix", ProjectionMatrix)
                 .SetUniform("modelMatrix", ModelMatrix)
                 .SetUniform("viewMatrix", ViewMatrix)
-                .SetUniform("particlePositionTexture", 0);
+                .SetUniform("particlePositionTexture", 0)
+                .SetUniform("particleColourTexture", 1);
             vertexVBO.Bind(program.Resource.VariableLocations["vertex"]);
             indexVBO.Bind();
             GL.DrawElements(BeginMode.Points, indexVBO.Length, DrawElementsType.UnsignedInt, 0);

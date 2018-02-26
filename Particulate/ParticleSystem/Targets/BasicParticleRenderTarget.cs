@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Particulate.ParticleSystem.Targets
 {
-    public class BasicParticleRenderTarget : RenderTargetBase
+    public class BasicParticleRenderTarget : RenderTargetBase, IParticleRenderTarget
     {
 
         public BasicParticleRenderTarget(int width, int height) : base(false, false, width, height)
