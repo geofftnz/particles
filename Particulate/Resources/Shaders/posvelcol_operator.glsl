@@ -172,8 +172,28 @@ void main(void)
 	vec4 vel = texture2D(particleVelocityTexture,texcoord);
 	vec4 col = texture2D(particleColourTexture,texcoord);
 
-	pos = blob1(texcoord);
-	col = vec4(1.0,0.2,0.1,1.0);
+	//pos = blob1(texcoord);
+	//col = vec4(1.0,0.2,0.1,1.0);
+
+
+	// pos: xyz + size
+	// vel: xyz + life
+	// col: rgb + ?
+
+	if (vel.a <= 0.00001)
+	{
+		// respawn particle
+		pos.xyz = randomPos(texcoord,time);
+		pos.a = 0.5;
+		vel.xyz = normalize(pos.xyz) * -0.0001;
+		vel.a = hash13(vec3(pos.xy,time));
+		col = vec4(randomPos01(texcoord,time*2.0),1.0);
+	} 
+	else
+	{
+		pos.xyz += vel.xyz;
+		vel.a -= 0.001;
+	}
 
 	out_Pos = pos;
 	out_Vel = vel;

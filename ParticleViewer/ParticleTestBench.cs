@@ -91,10 +91,9 @@ namespace ParticleViewer
             {
                 TextureBinds = () =>
                 {
-                    var m = model;
-                    m.ParticlePositionRead.Bind(TextureUnit.Texture0);
-                    m.ParticleVelocityRead.Bind(TextureUnit.Texture1);
-                    m.ParticleColourRead.Bind(TextureUnit.Texture2);
+                    model.ParticlePositionRead.Bind(TextureUnit.Texture0);
+                    model.ParticleVelocityRead.Bind(TextureUnit.Texture1);
+                    model.ParticleColourRead.Bind(TextureUnit.Texture2);
                 },
                 SetShaderUniforms = (sp) =>
                 {
