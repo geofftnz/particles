@@ -23,6 +23,8 @@ uniform sampler2D particlePositionTexture;
 uniform sampler2D particleVelocityTexture;
 uniform sampler2D particleColourTexture;
 
+#include "Common/Noise/noise4d.glsl"
+
 //From Dave (https://www.shadertoy.com/view/XlfGWN)
 float hash13(vec3 p){
 	p  = fract(p * vec3(.16532,.17369,.15787));
@@ -166,6 +168,24 @@ vec4 strings2(vec2 coord)
 }
 
 
+// gets the accelleration vector field at p
+vec3 field(vec3 p)
+{
+	vec3 v = vec3(0.0);
+
+	//v.x = 0.001;
+	//v = normalize(p) * -0.001;
+	//p*= 5.;
+	v.x = snoise(vec4(p,0.0));
+	v.y = snoise(vec4(p,3.7));
+	v.z = snoise(vec4(p,7.1));
+
+	v += normalize(p) * -0.1;
+
+	return v;
+}
+
+
 void main(void)
 {
 	vec4 pos = texture2D(particlePositionTexture,texcoord);
@@ -184,15 +204,19 @@ void main(void)
 	{
 		// respawn particle
 		pos.xyz = randomPos(texcoord,time);
-		pos.a = 0.5;
-		vel.xyz = normalize(pos.xyz) * -0.0001;
-		vel.a = hash13(vec3(pos.xy,time));
-		col = vec4(randomPos01(texcoord,time*2.0),1.0);
+		pos.a = 5.0;
+		vel.xyz = normalize(pos.xyz) * -0.00001;
+		vel.a = 1.0; //hash13(vec3(pos.xy,time));
+		col = vec4(randomPos01(texcoord,time*2.0),0.2);
 	} 
 	else
 	{
-		pos.xyz += vel.xyz;
-		vel.a -= 0.001;
+		vel.xyz += field(pos.xyz) * 0.01;
+		vel.xyz *= 0.99; // drag
+		pos.xyz += vel.xyz * 0.01;
+		vel.a -= 0.0001;
+		col.rgb = normalize(vel.xyz) * 0.5 + 0.5;
+		col.a = (vel.a * (1.0-vel.a)) * 4.0;
 	}
 
 	out_Pos = pos;
