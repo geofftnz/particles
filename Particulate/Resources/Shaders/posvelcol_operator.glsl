@@ -175,12 +175,19 @@ vec3 field(vec3 p)
 
 	//v.x = 0.001;
 	//v = normalize(p) * -0.001;
-	//p*= 5.;
-	v.x = snoise(vec4(p,0.0));
-	v.y = snoise(vec4(p,3.7));
-	v.z = snoise(vec4(p,7.1));
 
-	v += normalize(p) * -0.1;
+	float f = 1.0;
+	p*=0.5;
+	for(int i=0;i<3;i++)
+	{
+		v.x += snoise(vec4(p,0.0+time*0.04)) * f;
+		v.y += snoise(vec4(p,3.7+time*0.04)) * f;
+		v.z += snoise(vec4(p,7.1+time*0.04)) * f;
+		p*= 2.;
+		f *= 0.5;
+	}
+
+	v += normalize(p) * -0.2;
 
 	return v;
 }
@@ -204,18 +211,22 @@ void main(void)
 	{
 		// respawn particle
 		pos.xyz = randomPos(texcoord,time);
-		pos.a = 5.0;
+		pos.a = 2.0;
 		vel.xyz = normalize(pos.xyz) * -0.00001;
-		vel.a = 1.0; //hash13(vec3(pos.xy,time));
-		col = vec4(randomPos01(texcoord,time*2.0),0.2);
+		vel.a = 0.2 + snoise(vec4(pos.xyz,0.0))*0.7;
+		
+		//col = vec4(randomPos01(texcoord,time*2.0),0.2);
+		col.rgb = (pos.xyz * 0.5 + vec3(0.5));
+		col.a = 0.2;
 	} 
 	else
 	{
 		vel.xyz += field(pos.xyz) * 0.01;
 		vel.xyz *= 0.99; // drag
-		pos.xyz += vel.xyz * 0.01;
+		pos.xyz += vel.xyz * 0.005;
 		vel.a -= 0.0001;
-		col.rgb = normalize(vel.xyz) * 0.5 + 0.5;
+		
+		//col.rgb = normalize(vel.xyz) * 0.5 + 0.5;
 		col.a = (vel.a * (1.0-vel.a)) * 4.0;
 	}
 

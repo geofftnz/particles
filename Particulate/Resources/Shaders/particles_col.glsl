@@ -51,8 +51,8 @@ void main(void)
 	
 	vec4 col2 = col; //vec4(1.0,0.2,0.1,1.0);
 	float a = (1.0 - smoothstep(0.1,1.0,rsq));
-	a *= min(1.0,size*0.1);
-	col2.a *= a;
+	a *= min(1.0,size*0.5);
+	col2.a *= clamp(a,0.0,1.0);
 
 	out_Colour = col2;
 }
