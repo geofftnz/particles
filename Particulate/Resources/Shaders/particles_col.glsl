@@ -50,8 +50,15 @@ void main(void)
 	//float a = (1.0 - smoothstep(0.5,1.0,rsq)) * (1.0 / (1.0 + rsq * 10.0));
 	
 	vec4 col2 = col; //vec4(1.0,0.2,0.1,1.0);
-	float a = (1.0 - smoothstep(0.1,1.0,rsq));
-	a *= min(1.0,size*0.5);
+
+	// circle pattern in alpha
+	float a = max(0.0,(1.0 - rsq));
+	a*=a;
+	//float a = (1.0 - smoothstep(0.1,1.0,rsq));
+	
+	// size < 0 alpha falloff
+	a *= min(1.0,size*0.8);
+
 	col2.a *= clamp(a,0.0,1.0);
 
 	out_Colour = col2;

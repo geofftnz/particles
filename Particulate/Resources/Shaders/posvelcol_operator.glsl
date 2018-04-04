@@ -46,7 +46,7 @@ vec3 randomPos01(vec2 particle, float nonce)
 }
 vec3 randomPos(vec2 particle, float nonce)
 {
-	return randomPos01(particle,nonce)	* vec3(2.0) - vec3(1.0);
+	return randomPos01(particle,nonce);
 }
 
 // random points on sphere surface, centered at origin, radius r
@@ -177,7 +177,7 @@ vec3 field(vec3 p)
 	//v = normalize(p) * -0.001;
 
 	float f = 1.0;
-	p*=0.5;
+	p*=2.0;
 	for(int i=0;i<3;i++)
 	{
 		v.x += snoise(vec4(p,0.0+time*0.04)) * f;
@@ -187,9 +187,18 @@ vec3 field(vec3 p)
 		f *= 0.5;
 	}
 
-	v += normalize(p) * -0.2;
+	v += normalize(p) * -0.05;
 
 	return v;
+}
+
+vec3 boxclamp(vec3 p, vec3 bmin, vec3 bmax)
+{
+	return vec3(
+		clamp(p.x, bmin.x, bmax.x),
+		clamp(p.y, bmin.y, bmax.y),
+		clamp(p.z, bmin.z, bmax.z)
+	);
 }
 
 
@@ -210,24 +219,26 @@ void main(void)
 	if (vel.a <= 0.00001)
 	{
 		// respawn particle
-		pos.xyz = randomPos(texcoord,time);
-		pos.a = 2.0;
+		pos.xyz = randomPos(texcoord,time) - vec3(0.5);
+		pos.a = 1.2 + hash(time) * 3.0;
 		vel.xyz = normalize(pos.xyz) * -0.00001;
 		vel.a = 0.2 + snoise(vec4(pos.xyz,0.0))*0.7;
 		
 		//col = vec4(randomPos01(texcoord,time*2.0),0.2);
 		col.rgb = (pos.xyz * 0.5 + vec3(0.5));
-		col.a = 0.2;
+		col.a = 0.1;
 	} 
 	else
 	{
-		vel.xyz += field(pos.xyz) * 0.01;
-		vel.xyz *= 0.99; // drag
-		pos.xyz += vel.xyz * 0.005;
+		pos.xyz = boxclamp(pos.xyz,vec3(-0.5),vec3(0.5));
+
+		vel.xyz += field(pos.xyz) * (0.01 * pos.a);
+		vel.xyz *= 0.95; // drag
+		pos.xyz += vel.xyz * 0.001;
 		vel.a -= 0.0001;
 		
 		//col.rgb = normalize(vel.xyz) * 0.5 + 0.5;
-		col.a = (vel.a * (1.0-vel.a)) * 4.0;
+		//col.a = ((vel.a * (1.0-vel.a)) * 4.0) * 0.03;
 	}
 
 	out_Pos = pos;
