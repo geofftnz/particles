@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ParticleSystem\Models\MotionParticleModel.cs" />
+    <Compile Include="ParticleSystem\Operators\RaymarchOperator.cs" />
     <Compile Include="ParticleSystem\Operators\PosVelColOperator.cs" />
     <Compile Include="ParticleSystem\Operators\OperatorTest.cs" />
     <Compile Include="ParticleSystem\Renderers\ColourParticleRenderer.cs" />
@@ -64,6 +65,7 @@
   <ItemGroup>
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
+    <None Include="Resources\Shaders\Common\hg_sdf.glsl" />
     <None Include="Resources\Shaders\Common\Noise\noise2d.glsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -72,6 +74,9 @@
     </None>
     <None Include="Resources\Shaders\Common\Noise\noise4d.glsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\Shaders\raymarch_operator.glsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Resources\Shaders\posvelcol_operator.glsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

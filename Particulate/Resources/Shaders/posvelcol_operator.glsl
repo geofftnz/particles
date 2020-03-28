@@ -180,9 +180,9 @@ vec3 field(vec3 p)
 	p*=2.0;
 	for(int i=0;i<3;i++)
 	{
-		v.x += snoise(vec4(p,0.0+time*0.04)) * f;
-		v.y += snoise(vec4(p,3.7+time*0.04)) * f;
-		v.z += snoise(vec4(p,7.1+time*0.04)) * f;
+		v.x += snoise(vec4(p,0.0+time*0.01)) * f;
+		v.y += snoise(vec4(p,3.7+time*0.01)) * f;
+		v.z += snoise(vec4(p,7.1+time*0.01)) * f;
 		p*= 2.;
 		f *= 0.5;
 	}
@@ -225,15 +225,15 @@ void main(void)
 		vel.a = 0.2 + snoise(vec4(pos.xyz,0.0))*0.7;
 		
 		//col = vec4(randomPos01(texcoord,time*2.0),0.2);
-		col.rgb = (pos.xyz * 0.5 + vec3(0.5));
-		col.a = 0.1;
+		col.rgb = (normalize(pos.xyz) * 0.5 + vec3(0.5));
+		col.a = 0.2;
 	} 
 	else
 	{
-		pos.xyz = boxclamp(pos.xyz,vec3(-0.5),vec3(0.5));
+		//pos.xyz = boxclamp(pos.xyz,vec3(-0.5),vec3(0.5));
 
 		vel.xyz += field(pos.xyz) * (0.01 * pos.a);
-		vel.xyz *= 0.95; // drag
+		vel.xyz *= 0.98; // drag
 		pos.xyz += vel.xyz * 0.001;
 		vel.a -= 0.0001;
 		

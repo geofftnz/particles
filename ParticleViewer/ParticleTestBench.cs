@@ -36,7 +36,7 @@ namespace ParticleViewer
 
         ColourParticleRenderer particleRenderer;
         IParticleRenderTarget particleRenderTarget;
-        PosVelColOperator particleOperator;
+        RaymarchOperator particleOperator;
         MotionParticleModel model;
 
         public class RenderData : IFrameRenderData, IFrameUpdateData
@@ -87,7 +87,7 @@ namespace ParticleViewer
             });
 
             // particle operator
-            particleRenderTarget.Add(particleOperator = new PosVelColOperator()
+            particleRenderTarget.Add(particleOperator = new RaymarchOperator()
             {
                 TextureBinds = () =>
                 {
