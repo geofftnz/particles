@@ -97,7 +97,7 @@ namespace Particulate.ParticleSystem.Renderers
             //GL.Enable(EnableCap.VertexProgramPointSize);
             GL.Enable(EnableCap.PointSprite);
             GL.Enable(EnableCap.Blend);
-            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.One);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.One);
 
             ParticlePositionTextureFunc?.Invoke()?.Bind(TextureUnit.Texture0);
 

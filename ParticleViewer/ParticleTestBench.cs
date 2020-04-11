@@ -46,7 +46,7 @@ namespace ParticleViewer
         public RenderData frameData = new RenderData();
 
 
-        public ParticleTestBench() : base(800, 600, GraphicsMode.Default, "Particles or summin or nuttin", GameWindowFlags.Default, DisplayDevice.Default, 4, 3, GraphicsContextFlags.ForwardCompatible)
+        public ParticleTestBench() : base(800, 600, GraphicsMode.Default, "Particles or summin or nuttin")
         {
             VSync = VSyncMode.Off;
 
@@ -59,7 +59,8 @@ namespace ParticleViewer
             // set default shader loader
             ShaderProgram.DefaultLoader = new OpenTKExtensions.Loaders.MultiPathFileSystemLoader(SHADERPATH);
 
-            components.Add(camera = new WalkCamera(Keyboard, Mouse)
+            //OpenTK.Input.Keyboard.GetState()
+            components.Add(camera = new WalkCamera()
             {
                 FOV = 75.0f,
                 ZFar = 10.0f,
@@ -87,6 +88,8 @@ namespace ParticleViewer
             });
 
             // particle operator
+            particleRenderTarget.Add(new OperatorTest());
+            /*
             particleRenderTarget.Add(particleOperator = new RaymarchOperator()
             {
                 TextureBinds = () =>
@@ -102,7 +105,7 @@ namespace ParticleViewer
                     sp.SetUniform("particleVelocityTexture", 1);
                     sp.SetUniform("particleColourTexture", 2);
                 }
-            });
+            });*/
 
             // Render particles
             components.Add(particleRenderer = new ColourParticleRenderer(particleArrayWidth, particleArrayHeight)
